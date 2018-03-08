@@ -1,7 +1,7 @@
 const Twit = require('twit');
 
 const twitterSecret = require('./config.json');
-
+// twitterSecret['app_only_auth'] = true;
 const T = new Twit(twitterSecret);
 
 const TWITTER_GLOBAL_AVERAGE_FOLLOWER_COUNT = 60;
@@ -29,36 +29,50 @@ const TWITTER_GLOBAL_AVERAGE_FOLLOWER_COUNT = 60;
 //   });
 // };
 
-/**
- * Takes a twitter screen_name and returns the number of followers of
- * followers. Makes an estimate if number of followers is greater than 5000.
- * @param {string} screenName Screen name of the twitter user
- * @param {function} callback Callback function
- * @returns {number} returns the number of followers
- * @throws {error} relays the twitter error
- */
-const getTwitterScore = (screenName, callback) => {
-  // Queries twitter for basic user info
-  T.get('users/show', { screen_name: screenName }, (err1, data) => {
-    if (err1) throw err1;
+// /**
+//  * Takes a twitter screen_name and returns the number of followers of
+//  * followers. Makes an estimate if number of followers is greater than 5000.
+//  * @param {string} screenName Screen name of the twitter user
+//  * @param {function} callback Callback function
+//  * @returns {number} returns the number of followers
+//  * @throws {error} relays the twitter error
+//  */
+// const getTwitterScore = (screenName, callback) => {
+//   // Queries twitter for basic user info
+//   T.get('users/show', { screen_name: screenName }, (err1, data) => {
+//     if (err1) throw err1;
 
-    // If the number of followers is greater than 5000 then a single
-    // twitter request would not be sufficient to count the number of followers
-    // Multiple twitter requests might cause the rate to exceed so make an
-    // approximation.
-    if (data.followers_count > 5000) {
-      callback(data.followers_count * TWITTER_GLOBAL_AVERAGE_FOLLOWER_COUNT);
-    } else {
-      T.get('followers/list', { screen_name: screenName }, (err2, followersData) => {
-        if (err2) throw err2;
-        const totalScore = followersData.users
-          .map(user => user.followers_count)
-          .reduce((acc, score) => acc + score, 0);
-        callback(totalScore);
-      });
-    }
-  });
-};
+//     // If the number of followers is greater than 5000 then a single
+//     // twitter request would not be sufficient to count the number of followers
+//     // Multiple twitter requests might cause the rate to exceed so make an
+//     // approximation.
+//     if (data.followers_count > 5000) {
+//       callback(data.followers_count * TWITTER_GLOBAL_AVERAGE_FOLLOWER_COUNT);
+//     } else {
+//       T.get('followers/list', { screen_name: screenName }, (err2, followersData) => {
+//         if (err2) throw err2;
+//         const totalScore = followersData.users
+//           .map(user => user.followers_count)
+//           .reduce((acc, score) => acc + score, 0);
+//         callback(totalScore);
+//       });
+//     }
+//   });
+// };
 
-const screenName = 'fchollet'; // 'SouradeepNanda';
-getTwitterScore(screenName, console.log);
+// const screenName = 'fchollet'; // 'SouradeepNanda';
+// getTwitterScore(screenName, console.log);
+
+T.get('account/verify_credentials', { skip_status: true })
+  .catch(function (err) {
+    console.log('caught error', err.stack)
+  })
+  .then(function (result) {
+    // `result` is an Object with keys "data" and "resp".
+    // `data` and `resp` are the same objects as the ones passed
+    // to the callback.
+    // See https://github.com/ttezel/twit#tgetpath-params-callback
+    // for details.
+
+    console.log('data', result.data);
+  })
